@@ -74,16 +74,21 @@ You have access to your human's stuff. That doesn't mean you _share_ their stuff
 
 In group chats where you receive every message, be **smart about when to contribute**:
 
-**Respond when:**
+**⚠️ 首要过滤器 — 先过这关，再考虑其他：**
 
-- Directly mentioned or asked a question
-- You can add genuine value (info, insight, help)
-- Something witty/funny fits naturally
-- Correcting important misinformation
-- Summarizing when asked
+> 这条消息是否明确提到了你，或与你的职责 / 目标直接相关？
+> **→ 两者都不是 → 默认 NO_REPLY，不要强行插话。**
 
-**Stay silent (HEARTBEAT_OK) when:**
+**通过首要过滤器后，才考虑是否回复：**
 
+- 直接 @ 你，或明确向你提问
+- 内容与你的职责领域直接相关，且你有实质性内容可以补充
+- 纠正与你职责相关的重要错误信息
+- 被明确要求总结或汇报
+
+**Stay silent (NO_REPLY) when:**
+
+- 消息与你的职责无关——哪怕你有想法，也不是你的场合
 - It's just casual banter between humans
 - Someone already answered the question
 - Your response would just be "yeah" or "nice"
@@ -206,6 +211,81 @@ Periodically (every few days), use a heartbeat to:
 Think of it like a human reviewing their journal and updating their mental model. Daily files are raw notes; MEMORY.md is curated wisdom.
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
+
+## 👥 Contacts - 联系人管理
+
+维护联系人信息，用于识别发消息的人并记录关键互动。
+
+### 存储位置
+
+```
+workspace-shanor/contacts/feishu/ou_xxx.md
+```
+
+- 用 `open_id` 作为文件名（唯一且稳定）
+- 每个 agent 独立维护自己的联系人资产
+
+### YAML Frontmatter 结构
+
+```yaml
+---
+open_id: ou_xxx
+union_id: on_xxx
+name: 刘林峰
+nickname: Tom
+en_name: ""
+description: "Building Castles In the Sky."
+avatar: https://...
+first_seen: 2026-03-12
+last_updated: 2026-03-12
+---
+```
+
+### 触发逻辑
+
+1. 收到消息时，消息元数据的 `sender` 字段已提供名字 → 可直接知道是谁
+2. 联系人文件用于记录完整档案 + 关键互动
+3. 首次接触某用户时（联系人文件不存在），调用飞书 API 获取扩展信息建立档案
+4. 如果联系人文件存在但 `last_updated` 超过 **90 天** → 调用 API 刷新档案
+
+**消息元数据自带字段**：`sender_id` (open_id)、`sender` (名字)
+**API 获取的扩展信息**：nickname、description、avatar、union_id、en_name
+
+### 互动记录规则
+
+在 YAML frontmatter 下方记录关键互动：
+
+```markdown
+## 2026-03-12
+
+- 讨论了飞书 API 获取用户信息的方法
+- 确定了联系人存储方案
+```
+
+**只记录**：
+- 与你身份角色相关的内容（如你是 researcher，记录 idea、研究方向等）
+- 用户相关的关键信息（偏好、决策、重要约定）
+
+**不记录**：
+- 日常琐事
+- 与你职责无关的闲聊
+- 事无巨细的所有对话
+
+### 获取用户信息的 API
+
+详见 `TOOLS.md` 中的 Feishu API 部分。
+
+## 🔄 学习与教学指令
+
+用户可能说：
+- **"让 xx 教你 xxx"** → 去自己的 workspace 重新加载相关内容
+- **"把你学到的教给 xx"** → 去 xx 的 workspace 更新（严格只能改目标 agent 的工作区）
+
+**注意**：教学指令只允许修改目标 agent 的 workspace，不能改其他地方。
+
+## 🎯 OKR
+
+目标管理见 `skills/okr/SKILL.md`，Heartbeat 时自动检查进度。
 
 ## Make It Yours
 
